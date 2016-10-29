@@ -1,5 +1,28 @@
 from bs4 import BeautifulSoup
 
+inputFile = open("isis.txt", "rb")
+outputFile = open("isis.csv", "w")
+
+outputFile.write("Term,Handle,ID,Time,Text\n")
+for line in inputFile:
+    soup = BeautifulSoup(line, "lxml")
+    tweet = soup.find_all("tweet")
+    try:
+        term = tweet[0].find_all("term")[0].get_text()
+        handle = tweet[0].find_all("handle")[0].get_text()
+        id = tweet[0].find_all("id")[0].get_text()
+        time = tweet[0].find_all("time")[0].get_text()
+        text = tweet[0].find_all("text")[0].get_text()
+        text = text.replace(",", "")
+        text = text.replace("\"", "")
+        output = "\"" + term + "\",\"" + handle + "\",\"" + id + "\",\"" + time + "\",\"" + text + "\"\n"
+        outputFile.write(output)
+    except IndexError:
+        "Error with line..."
+
+inputFile.close()
+outputFile.close()
+
 inputFile = open("isis_sample.txt", "rb")
 outputFile = open("isis_sample.csv", "w")
 
@@ -14,6 +37,7 @@ for line in inputFile:
         time = tweet[0].find_all("time")[0].get_text()
         text = tweet[0].find_all("text")[0].get_text()
         text = text.replace(",", "")
+        text = text.replace("\"", "")
         output = "\"" + term + "\",\"" + handle + "\",\"" + id + "\",\"" + time + "\",\"" + text + "\"\n"
         outputFile.write(output)
     except IndexError:
@@ -44,6 +68,7 @@ for line in inputFile:
         retweet_count = tweet[0].find_all("retweet_count")[0].get_text()
         text = tweet[0].find_all("text")[0].get_text()
         text = text.replace(",", "")
+        text = text.replace("\"", "")
         output = "\"" + term + "\",\"" + handle + "\",\"" + location + "\",\"" + language + "\",\"" + default_image + "\",\"" + follower_count + "\",\"" + friend_count + "\",\"" + status_count + "\",\"" + id + "\",\"" + time + "\",\"" + retweet_count + "\",\"" + text + "\"\n"
         outputFile.write(output)
     except IndexError:

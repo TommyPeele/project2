@@ -1,5 +1,20 @@
 import pandas as pd
 
+dataFrame = pd.read_csv("isis.csv", sep=",", encoding="latin1")
+print("isis.csv Cleanliness Evaluation")
+
+validTerms = dataFrame[dataFrame["Term"].notnull()]
+validHandles = dataFrame[dataFrame["Handle"].notnull()]
+validIDs = dataFrame[dataFrame["ID"].notnull()]
+validTimes = dataFrame[dataFrame["Time"].notnull()]
+validTexts = dataFrame[dataFrame["Text"].notnull()]
+
+print("Number of tweets with missing Term values:", len(dataFrame) - len(validTerms))
+print("Number of tweets with missing Handle values:", len(dataFrame) - len(validHandles))
+print("Number of tweets with missing ID values:", len(dataFrame) - len(validIDs))
+print("Number of tweets with missing Time values:", len(dataFrame) - len(validTimes))
+print("Number of tweets with missing Text values:", len(dataFrame) - len(validTexts))
+
 dataFrame = pd.read_csv("isis_sample.csv", sep=",", encoding="latin1")
 print("isis_sample.csv Cleanliness Evaluation")
 
