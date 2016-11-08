@@ -1,78 +1,65 @@
 from bs4 import BeautifulSoup
 
-inputFile = open("isis.txt", "rb")
-outputFile = open("isis.csv", "w")
+def generateCSV(inputFilename, outputFilename, element, tags):
+    inputData = []
+    outputData = ""
 
-outputFile.write("Term,Handle,ID,Time,Text\n")
-for line in inputFile:
-    soup = BeautifulSoup(line, "lxml")
-    tweet = soup.find_all("tweet")
-    try:
-        term = tweet[0].find_all("term")[0].get_text()
-        handle = tweet[0].find_all("handle")[0].get_text()
-        id = tweet[0].find_all("id")[0].get_text()
-        time = tweet[0].find_all("time")[0].get_text()
-        text = tweet[0].find_all("text")[0].get_text()
-        text = text.replace(",", "")
-        text = text.replace("\"", "")
-        output = "\"" + term + "\",\"" + handle + "\",\"" + id + "\",\"" + time + "\",\"" + text + "\"\n"
-        outputFile.write(output)
-    except IndexError:
-        "Error with line..."
+    for tag in tags:
+        inputData.append(tag)
+        outputData += tag + ","
+    outputData = outputData[:-1]  # Removes final, unnecessary comma from header row
 
-inputFile.close()
-outputFile.close()
+    with open(inputFilename, "rb") as inputFile, open(outputFilename, "w") as outputFile:
+        outputFile.write(outputData + "\n")
 
-inputFile = open("isis_sample.txt", "rb")
-outputFile = open("isis_sample.csv", "w")
+        for line in inputFile:
+            soup = BeautifulSoup(line, "lxml")
+            currentElement = soup.find_all(element)
 
-outputFile.write("Term,Handle,ID,Time,Text\n")
-for line in inputFile:
-    soup = BeautifulSoup(line, "lxml")
-    tweet = soup.find_all("tweet")
-    try:
-        term = tweet[0].find_all("term")[0].get_text()
-        handle = tweet[0].find_all("handle")[0].get_text()
-        id = tweet[0].find_all("id")[0].get_text()
-        time = tweet[0].find_all("time")[0].get_text()
-        text = tweet[0].find_all("text")[0].get_text()
-        text = text.replace(",", "")
-        text = text.replace("\"", "")
-        output = "\"" + term + "\",\"" + handle + "\",\"" + id + "\",\"" + time + "\",\"" + text + "\"\n"
-        outputFile.write(output)
-    except IndexError:
-        "Error with line..."
+            isEmpty = 1
+            outputData = "\""
 
-inputFile.close()
-outputFile.close()
+            for x in range(0, len(tags)):
+                try:
+                    inputData[x] = currentElement[0].find_all(tags[x])[0].get_text()
 
-inputFile = open("NewUserTweets.txt", "rb")
-outputFile = open("NewUserTweets.csv", "w")
+                    if tags[x] == "text":
+                        inputData[x] = inputData[x].replace(",", "")
+                        inputData[x] = inputData[x].replace("\"", "")
 
-outputFile.write("Term,Handle,Location,Language,Default Image,Follower Count,Friend Count,Status Count,ID,Time,Retweet Count,Text\n")
+                    if(inputData[x] != ""):
+                        isEmpty = 0
 
-for line in inputFile:
-    soup = BeautifulSoup(line, "lxml")
-    tweet = soup.find_all("tweet")
-    try:
-        term = tweet[0].find_all("term")[0].get_text()
-        handle = tweet[0].find_all("handle")[0].get_text()
-        location = tweet[0].find_all("location")[0].get_text()
-        language = tweet[0].find_all("language")[0].get_text()
-        default_image = tweet[0].find_all("default_image")[0].get_text()
-        follower_count = tweet[0].find_all("follower_count")[0].get_text()
-        friend_count = tweet[0].find_all("friend_count")[0].get_text()
-        status_count = tweet[0].find_all("status_count")[0].get_text()
-        id = tweet[0].find_all("id")[0].get_text()
-        time = tweet[0].find_all("time")[0].get_text()
-        retweet_count = tweet[0].find_all("retweet_count")[0].get_text()
-        text = tweet[0].find_all("text")[0].get_text()
-        text = text.replace(",", "")
-        text = text.replace("\"", "")
-        output = "\"" + term + "\",\"" + handle + "\",\"" + location + "\",\"" + language + "\",\"" + default_image + "\",\"" + follower_count + "\",\"" + friend_count + "\",\"" + status_count + "\",\"" + id + "\",\"" + time + "\",\"" + retweet_count + "\",\"" + text + "\"\n"
-        outputFile.write(output)
-    except IndexError:
-        "Error with line..."
+                    outputData += inputData[x] + "\",\""
+                except IndexError:
+                    "Error with line..."
 
-inputFile.close()
-outputFile.close()
+            if isEmpty == 0:
+                outputData = outputData[:-3]
+                outputData += "\"\n"
+                outputFile.write(outputData)
+
+twitterTweet = "tweet"
+tagSet1 = ["term", "handle", "id", "time", "text"]
+# generateCSV("isis.txt", "isis.csv", twitterTweet, tagSet1)
+generateCSV("isis_sample.txt", "isis_sample.csv", twitterTweet, tagSet1)
+
+tagSet2 = ["term", "handle", "location", "language", "default_image", "follower_count", "friend_count", "status_count", "id", "time", "retweet_count", "text"]
+generateCSV("NewUserTweets.txt", "NewUserTweets.csv", twitterTweet, tagSet2)
+
+tagSet3 = ["term", "handle", "location", "language", "default_image", "follower_count", "friend_count", "status_count", "id", "time", "retweet_count", "text", "l1score", "l2score"]
+generateCSV("ProcessedTweets.txt", "ProcessedTweets.csv", twitterTweet, tagSet3)
+
+# redditSubmission = "submission"
+# tagSet4 = ["username", "postid", "time", "title", "subreddit", "score", "num_comments", "text"]
+# generateCSV("AllRedditSubmissions.txt", "AllRedditSubmissions.csv", redditSubmission, tagSet4)
+
+# tagSet5 = ["username", "postid", "time", "title", "subreddit", "score", "num_comments", "text", "plistscore"]
+# generateCSV("ProcessedSubmissions.txt", "ProcessedSubmissions.csv", redditSubmission, tagSet5)
+
+redditComment = "comment"
+tagSet6 = ["username", "postid", "time", "subreddit", "score", "gold", "text"]
+generateCSV("AllRedditComments.txt", "AllRedditComments.csv", redditComment, tagSet6)
+
+tagSet7 = ["username", "postid", "time", "subreddit", "score", "gold", "text", "plistscore"]
+generateCSV("ProcessedComments.txt", "ProcessedComments.csv", redditComment, tagSet7)
